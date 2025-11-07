@@ -254,6 +254,10 @@ function balanceCardHeights() {
 
 // Main function to initialize the dashboard
 async function init() {
+    const startTime = Date.now();
+    const minLoadingTime = 2000; // 2 seconds minimum
+    
+    showLoading();
     const data = await loadData();
     if (data) {
         populateDashboard(data);
@@ -266,6 +270,32 @@ async function init() {
     } else {
         console.error('Failed to load data');
     }
+    
+    // Ensure loading animation shows for at least 2 seconds
+    const elapsedTime = Date.now() - startTime;
+    const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
+    setTimeout(() => {
+        hideLoading();
+    }, remainingTime);
+}
+
+// Loading animation functions
+function showLoading() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        overlay.classList.remove('hide');
+    }
+    // Hide dashboard content during loading
+    document.body.classList.add('loading');
+}
+
+function hideLoading() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        overlay.classList.add('hide');
+    }
+    // Show dashboard content after loading
+    document.body.classList.remove('loading');
 }
 
 // Initialize when page loads
