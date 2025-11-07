@@ -1,0 +1,230 @@
+{
+  "user": {
+    "personal_info": {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "age": 34,
+      "weight": 75.5,
+      "height": 1.78,
+      "biological_sex": "male",
+      "email": "john.smith@example.com"
+    },
+    
+    "daily_activity": {
+      "id": "da_2024-11-06",
+      "day": "2024-11-06",
+      "score": 85,
+      "active_calories": 650,
+      "average_met_minutes": 1.8,
+      "high_activity_met_minutes": 180,
+      "high_activity_time": 3600,
+      "medium_activity_met_minutes": 240,
+      "medium_activity_time": 7200,
+      "low_activity_met_minutes": 420,
+      "low_activity_time": 14400,
+      "inactivity_alerts": 2,
+      "steps": 12450,
+      "equivalent_walking_distance": 9800,
+      "resting_time": 28800,
+      "sedentary_met_minutes": 120,
+      "sedentary_time": 18000,
+      "total_calories": 2450,
+      "target_calories": 2300,
+      "target_meters": 10000,
+      "contributors": {
+        "meet_daily_targets": 90,
+        "move_every_hour": 75,
+        "recovery_time": 88,
+        "stay_active": 82,
+        "training_frequency": 78,
+        "training_volume": 85
+      },
+      "timestamp": "2024-11-06T23:59:59+00:00"
+    },
+    
+    "daily_sleep": {
+      "id": "ds_2024-11-06",
+      "day": "2024-11-06",
+      "score": 78,
+      "contributors": {
+        "deep_sleep": 75,
+        "efficiency": 88,
+        "latency": 72,
+        "rem_sleep": 80,
+        "restfulness": 85,
+        "timing": 70,
+        "total_sleep": 82
+      },
+      "timestamp": "2024-11-06T08:30:00+00:00"
+    },
+    
+    "sleep_details": {
+      "id": "sleep_12345abc",
+      "day": "2024-11-06",
+      "bedtime_start": "2024-11-05T23:15:00+00:00",
+      "bedtime_end": "2024-11-06T07:30:00+00:00",
+      "total_sleep_duration": 27900,
+      "awake_time": 2100,
+      "light_sleep_duration": 14400,
+      "deep_sleep_duration": 7200,
+      "rem_sleep_duration": 6300,
+      "efficiency": 93,
+      "latency": 780,
+      "average_breath": 14.5,
+      "average_heart_rate": 52.3,
+      "average_hrv": 67,
+      "lowest_heart_rate": 48,
+      "movement_30_sec": "<base64_encoded_string>",
+      "sleep_phase_5_min": "444443333222222211111222333444444444433333322222211111222233334444",
+      "time_in_bed": 30000,
+      "type": "long_sleep",
+      "readiness_score_delta": 3
+    },
+    
+    "daily_readiness": {
+      "id": "dr_2024-11-06",
+      "day": "2024-11-06",
+      "score": 82,
+      "temperature_deviation": -0.2,
+      "temperature_trend_deviation": 0.1,
+      "contributors": {
+        "activity_balance": 85,
+        "body_temperature": 90,
+        "hrv_balance": 78,
+        "previous_day_activity": 88,
+        "previous_night_sleep": 80,
+        "recovery_index": 75,
+        "resting_heart_rate": 82,
+        "sleep_balance": 79
+      },
+      "timestamp": "2024-11-06T08:30:00+00:00"
+    },
+    
+    "daily_stress": {
+      "id": "stress_2024-11-06",
+      "day": "2024-11-06",
+      "stress_high": 180,
+      "recovery_high": 420,
+      "day_summary": "normal"
+    },
+    
+    "spo2": {
+      "id": "spo2_2024-11-06",
+      "day": "2024-11-06",
+      "spo2_percentage": {
+        "average": 96.8
+      },
+      "breathing_disturbance_index": 2.3
+    },
+    
+    "vo2_max": {
+      "id": "vo2max_12345",
+      "day": "2024-11-06",
+      "vo2_max": 48.5,
+      "timestamp": "2024-11-06T19:00:00+00:00"
+    },
+    
+    "workout": {
+      "id": "workout_98765xyz",
+      "activity": "running",
+      "start_datetime": "2024-11-06T18:00:00+00:00",
+      "end_datetime": "2024-11-06T19:00:00+00:00",
+      "calories": 520,
+      "distance": 8500,
+      "intensity": "moderate",
+      "source": "manual_entry",
+      "average_heart_rate": 145,
+      "max_heart_rate": 168
+    },
+    
+    "daily_resilience": {
+      "id": "resilience_2024-11-06",
+      "day": "2024-11-06",
+      "level": "good",
+      "contributors": {
+        "sleep_recovery": 85,
+        "daytime_recovery": 78,
+        "stress": 72
+      }
+    },
+    
+    "sleep_time_recommendation": {
+      "id": "sleeptime_2024-11-06",
+      "day": "2024-11-06",
+      "optimal_bedtime": {
+        "start_offset": -3600,
+        "end_offset": 0,
+        "day_tz": -18000
+      },
+      "recommendation": "earlier",
+      "status": "not_enough_nights"
+    },
+    
+    "enhanced_tags": [
+      {
+        "id": "tag_001",
+        "tag_type_code": "custom",
+        "start_time": "2024-11-06T20:00:00+00:00",
+        "end_time": "2024-11-06T20:30:00+00:00",
+        "start_day": "2024-11-06",
+        "end_day": "2024-11-06",
+        "comment": "Evening meditation session",
+        "custom_name": "Meditation"
+      },
+      {
+        "id": "tag_002",
+        "tag_type_code": null,
+        "start_time": "2024-11-06T13:00:00+00:00",
+        "end_time": null,
+        "start_day": "2024-11-06",
+        "end_day": "2024-11-06",
+        "comment": "Had coffee with lunch",
+        "custom_name": null
+      }
+    ],
+    
+    "ring_configuration": {
+      "id": "config_001",
+      "color": "silver",
+      "design": "heritage",
+      "firmware_version": "2.8.12",
+      "hardware_type": "gen3",
+      "set_up_at": "2023-01-15T10:30:00+00:00",
+      "size": 10
+    },
+    
+    "rest_mode_period": {
+      "id": "rest_001",
+      "start_day": "2024-11-04",
+      "end_day": "2024-11-06",
+      "start_time": "2024-11-04T08:00:00+00:00",
+      "end_time": "2024-11-06T08:00:00+00:00",
+      "episodes": [
+        {
+          "tags": ["sick", "fever"]
+        }
+      ]
+    },
+    
+    "daily_cardiovascular_age": {
+      "day": "2024-11-06",
+      "vascular_age": 28
+    }
+  },
+  
+  "metadata": {
+    "data_type": "oura_ring_comprehensive_user_data",
+    "generated_at": "2024-11-06T23:59:59+00:00",
+    "api_version": "2.0",
+    "notes": [
+      "All timestamps in ISO 8601 format with UTC timezone",
+      "Durations in seconds",
+      "Distances in meters",
+      "Weights in kilograms",
+      "Heights in meters",
+      "Scores typically range 0-100",
+      "Heart rate in beats per minute (bpm)",
+      "SpO2 as percentage",
+      "VO2 Max in ml/kg/min"
+    ]
+  }
+}
