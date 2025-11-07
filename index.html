@@ -4,196 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oura Ring Data Dashboard</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        h1 {
-            color: white;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .dashboard {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-        }
-
-        .card-title {
-            font-size: 1.2em;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: #667eea;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 8px;
-        }
-
-        .score-large {
-            font-size: 3em;
-            font-weight: bold;
-            color: #667eea;
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .metric {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .metric:last-child {
-            border-bottom: none;
-        }
-
-        .metric-label {
-            color: #666;
-            font-weight: 500;
-        }
-
-        .metric-value {
-            color: #333;
-            font-weight: 600;
-        }
-
-        .contributors {
-            margin-top: 16px;
-        }
-
-        .contributor {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .contributor-label {
-            font-size: 0.9em;
-            color: #666;
-        }
-
-        .contributor-score {
-            font-weight: 600;
-            color: #667eea;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #f0f0f0;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 4px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            transition: width 0.3s ease;
-        }
-
-        .tag {
-            display: inline-block;
-            background: #f0f0f0;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            margin: 4px;
-            color: #666;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
-            margin-top: 8px;
-        }
-
-        .status-normal {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-good {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-
-        .workout-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .workout-card .card-title,
-        .workout-card .metric-label,
-        .workout-card .metric-value {
-            color: white;
-        }
-
-        .workout-card .metric {
-            border-bottom-color: rgba(255,255,255,0.2);
-        }
-
-        .time-display {
-            font-size: 0.9em;
-            color: #999;
-            margin-top: 8px;
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .full-width {
-            grid-column: 1 / -1;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Oura Ring Data Dashboard</h1>
-        
         <div class="dashboard">
             <!-- Personal Info Card -->
-            <div class="card">
+            <div class="card hide">
                 <div class="card-title">Personal Information</div>
                 <div class="metric">
                     <span class="metric-label">Age</span>
@@ -409,7 +226,7 @@
             </div>
 
             <!-- Workout Card -->
-            <div class="card workout-card">
+            <div class="card workout-card hide">
                 <div class="card-title">Workout</div>
                 <div class="metric">
                     <span class="metric-label">Activity</span>
@@ -460,7 +277,7 @@
             </div>
 
             <!-- Ring Configuration Card -->
-            <div class="card">
+            <div class="card hide">
                 <div class="card-title">Ring Configuration</div>
                 <div class="metric">
                     <span class="metric-label">Color</span>
@@ -485,7 +302,7 @@
             </div>
 
             <!-- Sleep Recommendation Card -->
-            <div class="card">
+            <div class="card hide">
                 <div class="card-title">Sleep Recommendation</div>
                 <div class="metric">
                     <span class="metric-label">Recommendation</span>
@@ -498,230 +315,13 @@
             </div>
 
             <!-- Enhanced Tags Card -->
-            <div class="card full-width">
+            <div class="card full-width hide">
                 <div class="card-title">Enhanced Tags</div>
                 <div id="enhanced_tags">-</div>
             </div>
         </div>
     </div>
 
-    <script>
-        // Function to format duration in seconds to hours and minutes
-        function formatDuration(seconds) {
-            if (!seconds) return '-';
-            const hours = Math.floor(seconds / 3600);
-            const minutes = Math.floor((seconds % 3600) / 60);
-            if (hours > 0) {
-                return `${hours}h ${minutes}m`;
-            }
-            return `${minutes}m`;
-        }
-
-        // Function to format distance in meters
-        function formatDistance(meters) {
-            if (!meters) return '-';
-            if (meters >= 1000) {
-                return `${(meters / 1000).toFixed(2)} km`;
-            }
-            return `${meters} m`;
-        }
-
-        // Function to format date/time
-        function formatDateTime(dateString) {
-            if (!dateString) return '-';
-            const date = new Date(dateString);
-            return date.toLocaleString();
-        }
-
-        // Function to format time range
-        function formatTimeRange(start, end) {
-            if (!start || !end) return '-';
-            const startDate = new Date(start);
-            const endDate = new Date(end);
-            return `${startDate.toLocaleTimeString()} - ${endDate.toLocaleTimeString()}`;
-        }
-
-        // Function to populate progress bars
-        function setProgress(elementId, value) {
-            const element = document.getElementById(elementId);
-            if (element && value !== null && value !== undefined) {
-                element.style.width = `${value}%`;
-            }
-        }
-
-        // Function to load and parse JSON data
-        async function loadData() {
-            try {
-                const response = await fetch('oura_sample_user.json');
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error('Error loading data:', error);
-                return null;
-            }
-        }
-
-        // Function to populate all divs with extracted values
-        function populateDashboard(data) {
-            if (!data || !data.user) return;
-
-            const user = data.user;
-
-            // Personal Info
-            if (user.personal_info) {
-                document.getElementById('age').textContent = user.personal_info.age || '-';
-                document.getElementById('weight').textContent = user.personal_info.weight ? `${user.personal_info.weight} kg` : '-';
-                document.getElementById('height').textContent = user.personal_info.height ? `${user.personal_info.height} m` : '-';
-                document.getElementById('biological_sex').textContent = user.personal_info.biological_sex || '-';
-                document.getElementById('email').textContent = user.personal_info.email || '-';
-            }
-
-            // Daily Activity
-            if (user.daily_activity) {
-                const activity = user.daily_activity;
-                document.getElementById('activity_score').textContent = activity.score || '-';
-                document.getElementById('steps').textContent = activity.steps ? activity.steps.toLocaleString() : '-';
-                document.getElementById('active_calories').textContent = activity.active_calories || '-';
-                document.getElementById('total_calories').textContent = activity.total_calories || '-';
-                document.getElementById('target_calories').textContent = activity.target_calories || '-';
-                document.getElementById('equivalent_walking_distance').textContent = formatDistance(activity.equivalent_walking_distance);
-
-                if (activity.contributors) {
-                    document.getElementById('contrib_meet_daily_targets').textContent = activity.contributors.meet_daily_targets || '-';
-                    document.getElementById('contrib_move_every_hour').textContent = activity.contributors.move_every_hour || '-';
-                    document.getElementById('contrib_recovery_time').textContent = activity.contributors.recovery_time || '-';
-                    setProgress('progress_meet_daily_targets', activity.contributors.meet_daily_targets);
-                    setProgress('progress_move_every_hour', activity.contributors.move_every_hour);
-                    setProgress('progress_recovery_time', activity.contributors.recovery_time);
-                }
-            }
-
-            // Daily Sleep
-            if (user.daily_sleep) {
-                const sleep = user.daily_sleep;
-                document.getElementById('sleep_score').textContent = sleep.score || '-';
-                if (sleep.contributors) {
-                    document.getElementById('contrib_total_sleep').textContent = sleep.contributors.total_sleep || '-';
-                    document.getElementById('contrib_efficiency').textContent = sleep.contributors.efficiency || '-';
-                    document.getElementById('contrib_deep_sleep').textContent = sleep.contributors.deep_sleep || '-';
-                    document.getElementById('contrib_rem_sleep').textContent = sleep.contributors.rem_sleep || '-';
-                    setProgress('progress_total_sleep', sleep.contributors.total_sleep);
-                    setProgress('progress_efficiency', sleep.contributors.efficiency);
-                    setProgress('progress_deep_sleep', sleep.contributors.deep_sleep);
-                    setProgress('progress_rem_sleep', sleep.contributors.rem_sleep);
-                }
-            }
-
-            // Sleep Details
-            if (user.sleep_details) {
-                const sleepDetails = user.sleep_details;
-                document.getElementById('total_sleep_duration').textContent = formatDuration(sleepDetails.total_sleep_duration);
-                document.getElementById('deep_sleep_duration').textContent = formatDuration(sleepDetails.deep_sleep_duration);
-                document.getElementById('rem_sleep_duration').textContent = formatDuration(sleepDetails.rem_sleep_duration);
-                document.getElementById('light_sleep_duration').textContent = formatDuration(sleepDetails.light_sleep_duration);
-                document.getElementById('awake_time').textContent = formatDuration(sleepDetails.awake_time);
-                document.getElementById('sleep_efficiency').textContent = sleepDetails.efficiency ? `${sleepDetails.efficiency}%` : '-';
-                document.getElementById('sleep_latency').textContent = formatDuration(sleepDetails.latency);
-                document.getElementById('avg_heart_rate_sleep').textContent = sleepDetails.average_heart_rate ? `${sleepDetails.average_heart_rate} bpm` : '-';
-                document.getElementById('avg_hrv').textContent = sleepDetails.average_hrv || '-';
-                document.getElementById('bedtime_range').textContent = formatTimeRange(sleepDetails.bedtime_start, sleepDetails.bedtime_end);
-            }
-
-            // Daily Readiness
-            if (user.daily_readiness) {
-                const readiness = user.daily_readiness;
-                document.getElementById('readiness_score').textContent = readiness.score || '-';
-                if (readiness.contributors) {
-                    document.getElementById('contrib_previous_night_sleep').textContent = readiness.contributors.previous_night_sleep || '-';
-                    document.getElementById('contrib_body_temperature').textContent = readiness.contributors.body_temperature || '-';
-                    document.getElementById('contrib_hrv_balance').textContent = readiness.contributors.hrv_balance || '-';
-                    document.getElementById('contrib_resting_heart_rate').textContent = readiness.contributors.resting_heart_rate || '-';
-                    setProgress('progress_previous_night_sleep', readiness.contributors.previous_night_sleep);
-                    setProgress('progress_body_temperature', readiness.contributors.body_temperature);
-                    setProgress('progress_hrv_balance', readiness.contributors.hrv_balance);
-                    setProgress('progress_resting_heart_rate', readiness.contributors.resting_heart_rate);
-                }
-            }
-
-            // Daily Stress
-            if (user.daily_stress) {
-                document.getElementById('stress_high').textContent = user.daily_stress.stress_high || '-';
-                document.getElementById('recovery_high').textContent = user.daily_stress.recovery_high || '-';
-                document.getElementById('day_summary').textContent = user.daily_stress.day_summary || '-';
-            }
-
-            // Daily Resilience
-            if (user.daily_resilience) {
-                document.getElementById('resilience_level').textContent = user.daily_resilience.level || '-';
-            }
-
-            // Workout
-            if (user.workout) {
-                const workout = user.workout;
-                document.getElementById('workout_activity').textContent = workout.activity || '-';
-                document.getElementById('workout_intensity').textContent = workout.intensity || '-';
-                document.getElementById('workout_calories').textContent = workout.calories || '-';
-                document.getElementById('workout_distance').textContent = formatDistance(workout.distance);
-                document.getElementById('workout_avg_hr').textContent = workout.average_heart_rate ? `${workout.average_heart_rate} bpm` : '-';
-                document.getElementById('workout_max_hr').textContent = workout.max_heart_rate ? `${workout.max_heart_rate} bpm` : '-';
-                document.getElementById('workout_time').textContent = formatTimeRange(workout.start_datetime, workout.end_datetime);
-            }
-
-            // Health Metrics
-            if (user.spo2) {
-                document.getElementById('spo2_average').textContent = user.spo2.spo2_percentage?.average ? `${user.spo2.spo2_percentage.average}%` : '-';
-                document.getElementById('breathing_disturbance').textContent = user.spo2.breathing_disturbance_index || '-';
-            }
-            if (user.vo2_max) {
-                document.getElementById('vo2_max').textContent = user.vo2_max.vo2_max || '-';
-            }
-            if (user.daily_cardiovascular_age) {
-                document.getElementById('vascular_age').textContent = user.daily_cardiovascular_age.vascular_age ? `${user.daily_cardiovascular_age.vascular_age} years` : '-';
-            }
-
-            // Ring Configuration
-            if (user.ring_configuration) {
-                const ring = user.ring_configuration;
-                document.getElementById('ring_color').textContent = ring.color || '-';
-                document.getElementById('ring_design').textContent = ring.design || '-';
-                document.getElementById('ring_size').textContent = ring.size || '-';
-                document.getElementById('ring_hardware').textContent = ring.hardware_type || '-';
-                document.getElementById('ring_firmware').textContent = ring.firmware_version || '-';
-            }
-
-            // Sleep Recommendation
-            if (user.sleep_time_recommendation) {
-                document.getElementById('sleep_recommendation').textContent = user.sleep_time_recommendation.recommendation || '-';
-                document.getElementById('sleep_status').textContent = user.sleep_time_recommendation.status || '-';
-            }
-
-            // Enhanced Tags
-            if (user.enhanced_tags && Array.isArray(user.enhanced_tags)) {
-                const tagsContainer = document.getElementById('enhanced_tags');
-                if (user.enhanced_tags.length === 0) {
-                    tagsContainer.textContent = 'No tags';
-                } else {
-                    tagsContainer.innerHTML = user.enhanced_tags.map(tag => {
-                        const name = tag.custom_name || tag.comment || 'Untitled';
-                        const time = tag.start_time ? formatDateTime(tag.start_time) : '';
-                        return `<div class="tag">${name}${time ? ` (${time})` : ''}</div>`;
-                    }).join('');
-                }
-            }
-        }
-
-        // Main function to initialize the dashboard
-        async function init() {
-            const data = await loadData();
-            if (data) {
-                populateDashboard(data);
-            } else {
-                console.error('Failed to load data');
-            }
-        }
-
-        // Initialize when page loads
-        init();
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
