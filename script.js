@@ -296,6 +296,17 @@ function hideLoading() {
     }
     // Show dashboard content after loading
     document.body.classList.remove('loading');
+    // Animate cards one by one
+    animateCards();
+}
+
+function animateCards() {
+    const cards = document.querySelectorAll('.card:not(.hide)');
+    cards.forEach((card, index) => {
+        setTimeout(() => {
+            card.classList.add('card-visible');
+        }, index * 100); // 100ms delay between each card
+    });
 }
 
 // Initialize when page loads

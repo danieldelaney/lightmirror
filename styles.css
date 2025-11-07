@@ -73,7 +73,7 @@ h1 {
     border: 1px solid #00bfff;
     border-radius: 0;
     padding: clamp(8px, 1.5vh, 16px);
-    transition: all 0.3s ease;
+    transition: all 0.3s ease, opacity 0.5s ease, transform 0.5s ease;
     position: relative;
     min-width: 0;
     width: 100%;
@@ -81,6 +81,8 @@ h1 {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px);
 }
 
 .card::before {
@@ -314,6 +316,11 @@ h1 {
 .loading .container {
     opacity: 0;
     visibility: hidden;
+}
+
+.card.card-visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 #enhanced_tags {
