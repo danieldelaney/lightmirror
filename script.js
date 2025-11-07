@@ -202,11 +202,67 @@ function populateDashboard(data) {
     }
 }
 
+// Function to balance card heights in the grid
+function balanceCardHeights() {
+    const dashboard = document.querySelector('.dashboard');
+    if (!dashboard) return;
+    
+    const cards = Array.from(dashboard.querySelectorAll('.card:not(.hide)'));
+    if (cards.length === 0) return;
+    
+    // Reset any existing row spans and height constraints
+    cards.forEach(card => {
+        card.style.gridRow = '';
+        const originalHeight = card.style.height;
+        const originalMinHeight = card.style.minHeight;
+        card.style.height = 'auto';
+        card.style.minHeight = 'auto';
+    });
+    
+    // Force a reflow to get accurate measurements
+    void dashboard.offsetHeight;
+    
+    // Calculate content heights
+    const cardData = cards.map(card => {
+        const height = card.getBoundingClientRect().height;
+        // Count number of metrics and contributors to estimate content density
+        const metrics = card.querySelectorAll('.metric').length;
+        const contributors = card.querySelectorAll('.contributor').length;
+        const hasScore = card.querySelector('.score-large') !== null;
+        const contentScore = metrics * 2 + contributors * 3 + (hasScore ? 5 : 0);
+        
+        return { card, height, contentScore };
+    });
+    
+    // Calculate average height
+    const avgHeight = cardData.reduce((sum, item) => sum + item.height, 0) / cardData.length;
+    const maxHeight = Math.max(...cardData.map(item => item.height));
+    
+    // Allow cards that are significantly taller to span 2 rows
+    // This redistributes vertical space more evenly
+    cardData.forEach(item => {
+        if (item.height > avgHeight * 1.3 && item.height > maxHeight * 0.6) {
+            item.card.style.gridRow = 'span 2';
+        }
+    });
+    
+    // Restore height constraints
+    cards.forEach(card => {
+        card.style.height = '100%';
+    });
+}
+
 // Main function to initialize the dashboard
 async function init() {
     const data = await loadData();
     if (data) {
         populateDashboard(data);
+        // Balance card heights after content is loaded
+        setTimeout(balanceCardHeights, 100);
+        // Rebalance on window resize
+        window.addEventListener('resize', () => {
+            setTimeout(balanceCardHeights, 100);
+        });
     } else {
         console.error('Failed to load data');
     }
