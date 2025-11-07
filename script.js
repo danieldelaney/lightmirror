@@ -255,7 +255,7 @@ function balanceCardHeights() {
 // Main function to initialize the dashboard
 async function init() {
     const startTime = Date.now();
-    const minLoadingTime = 2000; // 2 seconds minimum
+    const minLoadingTime = 3000; // 2 seconds minimum
     
     showLoading();
     const data = await loadData();
@@ -279,149 +279,6 @@ async function init() {
     }, remainingTime);
 }
 
-// 3D Human Model variables
-let humanModelScene = null;
-let humanModelRenderer = null;
-let humanModelCamera = null;
-let humanModelGroup = null;
-let animationId = null;
-
-// Create wireframe 3D human model
-function createHumanModel() {
-    const container = document.getElementById('humanModelContainer');
-    if (!container || !window.THREE) return;
-    
-    // Clear existing content
-    while (container.firstChild) {
-        container.removeChild(container.firstChild);
-    }
-    
-    // Scene setup
-    humanModelScene = new THREE.Scene();
-    humanModelScene.background = null; // Transparent
-    
-    // Camera setup
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    humanModelCamera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-    humanModelCamera.position.set(0, 1.5, 5);
-    humanModelCamera.lookAt(0, 1, 0);
-    
-    // Renderer setup
-    humanModelRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    humanModelRenderer.setSize(width, height);
-    humanModelRenderer.setPixelRatio(window.devicePixelRatio);
-    container.appendChild(humanModelRenderer.domElement);
-    
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0x00bfff, 0.5);
-    humanModelScene.add(ambientLight);
-    
-    const pointLight = new THREE.PointLight(0x00bfff, 1, 100);
-    pointLight.position.set(5, 5, 5);
-    humanModelScene.add(pointLight);
-    
-    // Material for wireframe
-    const wireframeMaterial = new THREE.MeshBasicMaterial({
-        color: 0x00bfff,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.8
-    });
-    
-    // Create human figure group
-    humanModelGroup = new THREE.Group();
-    
-    // Head
-    const headGeometry = new THREE.SphereGeometry(0.15, 12, 12);
-    const head = new THREE.Mesh(headGeometry, wireframeMaterial);
-    head.position.set(0, 1.7, 0);
-    humanModelGroup.add(head);
-    
-    // Torso
-    const torsoGeometry = new THREE.BoxGeometry(0.4, 0.6, 0.3);
-    const torso = new THREE.Mesh(torsoGeometry, wireframeMaterial);
-    torso.position.set(0, 1.2, 0);
-    humanModelGroup.add(torso);
-    
-    // Left Arm
-    const leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.75, 0.12), wireframeMaterial);
-    leftArm.position.set(-0.4, 1.125, 0);
-    leftArm.rotation.z = -0.3;
-    humanModelGroup.add(leftArm);
-    
-    // Right Arm
-    const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.75, 0.12), wireframeMaterial);
-    rightArm.position.set(0.4, 1.125, 0);
-    rightArm.rotation.z = 0.3;
-    humanModelGroup.add(rightArm);
-    
-    // Left Leg
-    const leftThigh = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.5, 0.15), wireframeMaterial);
-    leftThigh.position.set(-0.15, 0.5, 0);
-    humanModelGroup.add(leftThigh);
-    
-    const leftShin = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.5, 0.12), wireframeMaterial);
-    leftShin.position.set(-0.15, 0, 0);
-    humanModelGroup.add(leftShin);
-    
-    // Right Leg
-    const rightThigh = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.5, 0.15), wireframeMaterial);
-    rightThigh.position.set(0.15, 0.5, 0);
-    humanModelGroup.add(rightThigh);
-    
-    const rightShin = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.5, 0.12), wireframeMaterial);
-    rightShin.position.set(0.15, 0, 0);
-    humanModelGroup.add(rightShin);
-    
-    humanModelScene.add(humanModelGroup);
-    
-    // Animation loop
-    function animate() {
-        animationId = requestAnimationFrame(animate);
-        
-        if (humanModelGroup) {
-            humanModelGroup.rotation.y += 0.01; // Rotate continuously
-        }
-        
-        if (humanModelRenderer && humanModelScene && humanModelCamera) {
-            humanModelRenderer.render(humanModelScene, humanModelCamera);
-        }
-    }
-    
-    animate();
-    
-    // Handle window resize
-    window.addEventListener('resize', () => {
-        if (humanModelCamera && humanModelRenderer) {
-            humanModelCamera.aspect = window.innerWidth / window.innerHeight;
-            humanModelCamera.updateProjectionMatrix();
-            humanModelRenderer.setSize(window.innerWidth, window.innerHeight);
-        }
-    });
-}
-
-// Clean up 3D model
-function destroyHumanModel() {
-    if (animationId) {
-        cancelAnimationFrame(animationId);
-        animationId = null;
-    }
-    
-    if (humanModelRenderer) {
-        const container = document.getElementById('humanModelContainer');
-        if (container && humanModelRenderer.domElement) {
-            container.removeChild(humanModelRenderer.domElement);
-        }
-        humanModelRenderer.dispose();
-        humanModelRenderer = null;
-    }
-    
-    humanModelScene = null;
-    humanModelCamera = null;
-    humanModelGroup = null;
-}
-
 // Loading animation functions
 function showLoading() {
     const overlay = document.getElementById('loadingOverlay');
@@ -430,8 +287,14 @@ function showLoading() {
     }
     // Hide dashboard content during loading
     document.body.classList.add('loading');
-    // Create 3D human model
-    setTimeout(() => createHumanModel(), 100);
+    // Play scanning sound
+    const scanAudio = document.getElementById('scanAudio');
+    if (scanAudio) {
+        scanAudio.currentTime = 0;
+        scanAudio.play().catch(err => {
+            console.log('Audio play failed:', err);
+        });
+    }
 }
 
 function hideLoading() {
@@ -439,8 +302,11 @@ function hideLoading() {
     if (overlay) {
         overlay.classList.add('hide');
     }
-    // Destroy 3D human model
-    destroyHumanModel();
+    // Let audio continue playing until it ends naturally
+    const scanAudio = document.getElementById('scanAudio');
+    if (scanAudio) {
+        scanAudio.loop = false; // Disable looping so it plays once to the end
+    }
     // Show dashboard content after loading
     document.body.classList.remove('loading');
     // Animate cards one by one
