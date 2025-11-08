@@ -6,6 +6,8 @@ Lightmirror is an HTML document that displays Oura fitness tracker data, plus sc
 
 [Example video](example.mp4)
 
-# How do I install it?
+# How do I use it?
 
 You’ll need a simple HTTP server for the HTML document to work properly. (For example, nav to the directory containing index.html and do `python3 -m http.server 8000`, then in your browser nav to `localhost:8000`.)
+
+**Note that a webcam is required.** The screen will be black when the page loads, until you have (1) granted camera permissions and (2) fed the camera some motion to trigger the "scanning"/load animation.
