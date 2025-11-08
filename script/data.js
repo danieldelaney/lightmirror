@@ -44,7 +44,7 @@ function setProgress(elementId, value) {
 // Function to load and parse JSON data
 async function loadData() {
     try {
-        const response = await fetch('oura_sample_user.json');
+        const response = await fetch('data/oura_sample_user.json');
         const data = await response.json();
         return data;
     } catch (error) {
