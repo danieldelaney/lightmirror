@@ -381,3 +381,14 @@ h1 {
     }
 }
 
+/* Black screen overlay */
+body.black-screen .container {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 1s ease, visibility 1s ease;
+}
+
+body.black-screen {
+    background: #000000;
+}
+

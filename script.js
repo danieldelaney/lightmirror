@@ -252,10 +252,251 @@ function balanceCardHeights() {
     });
 }
 
-// Main function to initialize the dashboard
-async function init() {
+// Motion detection variables
+let video = null;
+let canvas = null;
+let ctx = null;
+let lastFrame = null;
+let backgroundFrame = null;
+let frameCount = 0;
+let motionDetectionActive = false;
+let lastMotionTime = null;
+let noMotionTimeout = null;
+const NO_MOTION_TIMEOUT = 3 * 60 * 1000; // 3 minutes in milliseconds
+const MOTION_THRESHOLD = 8; // Sensitivity threshold for motion detection (much less sensitive)
+const MOTION_SAMPLES = 30; // Number of consecutive frames with motion required (reduces false positives significantly)
+const BACKGROUND_LEARNING_RATE = 0.005; // How quickly background adapts (very slow - less sensitive)
+const MOTION_COOLDOWN = 5000; // Milliseconds to wait after motion before allowing new detection
+const MIN_MOTION_AREA = 0.05; // Minimum percentage of frame that must change (5%)
+let motionSampleCount = 0;
+let lastMotionTriggerTime = 0;
+let isDashboardVisible = false;
+let isLoading = false;
+
+// Initialize camera and motion detection
+async function initCamera() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { 
+                width: 320, 
+                height: 240,
+                facingMode: 'user' // Use front-facing camera
+            } 
+        });
+        
+        video = document.createElement('video');
+        video.srcObject = stream;
+        video.autoplay = true;
+        video.playsInline = true;
+        video.style.display = 'none';
+        document.body.appendChild(video);
+        
+        canvas = document.createElement('canvas');
+        canvas.width = 320;
+        canvas.height = 240;
+        ctx = canvas.getContext('2d');
+        
+        // Wait for video to be ready and playing
+        video.addEventListener('loadedmetadata', () => {
+            video.play().then(() => {
+                console.log('Video started playing, starting motion detection');
+                // Wait a bit for the first frame to be available
+                setTimeout(() => {
+                    startMotionDetection();
+                }, 500);
+            }).catch(err => {
+                console.error('Error playing video:', err);
+            });
+        });
+        
+    } catch (error) {
+        console.error('Error accessing camera:', error);
+        // If camera fails, still allow manual trigger (for testing)
+    }
+}
+
+// Start motion detection loop
+function startMotionDetection() {
+    if (motionDetectionActive) return;
+    motionDetectionActive = true;
+    detectMotion();
+}
+
+// Motion detection using frame difference with background subtraction
+function detectMotion() {
+    if (!video || !ctx || !motionDetectionActive) return;
+    
+    // Check if video is ready
+    if (video.readyState < 2) {
+        requestAnimationFrame(detectMotion);
+        return;
+    }
+    
+    try {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const currentFrame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        frameCount++;
+        
+        // Initialize background frame on first frame
+        if (!backgroundFrame) {
+            backgroundFrame = ctx.createImageData(canvas.width, canvas.height);
+            const bgData = backgroundFrame.data;
+            const curData = currentFrame.data;
+            for (let i = 0; i < curData.length; i++) {
+                bgData[i] = curData[i];
+            }
+            console.log('Background frame initialized, waiting for motion...');
+            lastFrame = currentFrame;
+            requestAnimationFrame(detectMotion);
+            return;
+        }
+        
+        // Update background frame very slowly (running average)
+        // This allows the background to adapt to lighting changes while detecting motion
+        // Only update background when dashboard is hidden AND no recent motion was detected
+        const timeSinceLastMotion = Date.now() - lastMotionTriggerTime;
+        // Wait 10 seconds after motion before updating background, and only update every 10th frame
+        if (!isDashboardVisible && timeSinceLastMotion > 10000 && frameCount % 10 === 0) {
+            const bgData = backgroundFrame.data;
+            const curData = currentFrame.data;
+            for (let i = 0; i < curData.length; i += 4) {
+                // Very slowly blend current frame into background
+                bgData[i] = bgData[i] * (1 - BACKGROUND_LEARNING_RATE) + curData[i] * BACKGROUND_LEARNING_RATE; // R
+                bgData[i + 1] = bgData[i + 1] * (1 - BACKGROUND_LEARNING_RATE) + curData[i + 1] * BACKGROUND_LEARNING_RATE; // G
+                bgData[i + 2] = bgData[i + 2] * (1 - BACKGROUND_LEARNING_RATE) + curData[i + 2] * BACKGROUND_LEARNING_RATE; // B
+                bgData[i + 3] = 255; // Alpha
+            }
+        }
+        
+        // Compare current frame against background (not previous frame)
+        const motion = calculateMotion(backgroundFrame, currentFrame);
+        
+        // Debug logging - log motion value every 60 frames (~1 second at 60fps)
+        if (!window.motionLogCounter) window.motionLogCounter = 0;
+        window.motionLogCounter++;
+        if (window.motionLogCounter % 60 === 0) {
+            console.log('Current motion:', motion.toFixed(2), 'Threshold:', MOTION_THRESHOLD, 'Samples:', motionSampleCount, 'Dashboard visible:', isDashboardVisible, 'Loading:', isLoading);
+        }
+        
+        // Check cooldown period - don't detect motion if we just triggered recently
+        const timeSinceLastTrigger = Date.now() - lastMotionTriggerTime;
+        const inCooldown = timeSinceLastTrigger < MOTION_COOLDOWN;
+        
+        if (motion > MOTION_THRESHOLD && !inCooldown) {
+            // Motion detected - increment sample count
+            motionSampleCount++;
+            
+            // Require motion in multiple consecutive frames to avoid false positives
+            if (motionSampleCount >= MOTION_SAMPLES) {
+                console.log('Motion threshold exceeded! Triggering dashboard load. Motion:', motion.toFixed(2));
+                const now = Date.now();
+                lastMotionTime = now;
+                lastMotionTriggerTime = now; // Set cooldown timer
+                motionSampleCount = 0; // Reset counter
+                
+                // Reset background frame to current frame to prevent false positives
+                const bgData = backgroundFrame.data;
+                const curData = currentFrame.data;
+                for (let i = 0; i < curData.length; i++) {
+                    bgData[i] = curData[i];
+                }
+                console.log('Background reset after motion detection');
+                
+                // Clear any existing timeout
+                if (noMotionTimeout) {
+                    clearTimeout(noMotionTimeout);
+                    noMotionTimeout = null;
+                }
+                
+                // If dashboard is visible, reset the timer (motion keeps it alive)
+                if (isDashboardVisible) {
+                    // Set new timeout for 3 minutes from now
+                    noMotionTimeout = setTimeout(() => {
+                        fadeToBlack();
+                        lastMotionTime = null;
+                        noMotionTimeout = null;
+                    }, NO_MOTION_TIMEOUT);
+                }
+                
+                // If dashboard is not visible and not loading, trigger load
+                if (!isDashboardVisible && !isLoading) {
+                    console.log('Calling triggerDashboardLoad()');
+                    triggerDashboardLoad();
+                }
+            }
+        } else {
+            // No motion detected or in cooldown - reset sample count
+            if (!inCooldown) {
+                motionSampleCount = 0;
+            }
+            // No motion detected - timeout is already set when motion was last detected
+            // No need to check here, the timeout will handle fading to black
+        }
+        
+        lastFrame = currentFrame;
+    } catch (error) {
+        console.error('Error in motion detection:', error);
+    }
+    
+    // Continue detection loop
+    requestAnimationFrame(detectMotion);
+}
+
+// Calculate motion difference between two frames using improved algorithm
+function calculateMotion(frame1, frame2) {
+    const data1 = frame1.data;
+    const data2 = frame2.data;
+    let totalDiff = 0;
+    let significantChanges = 0;
+    let pixelCount = 0;
+    
+    // Check every 4th pixel for better sensitivity (more pixels = better detection)
+    for (let i = 0; i < data1.length; i += 16) { // Every 4th pixel (RGBA = 4 bytes, so 16 = 4 pixels)
+        const r1 = data1[i];
+        const g1 = data1[i + 1];
+        const b1 = data1[i + 2];
+        const r2 = data2[i];
+        const g2 = data2[i + 1];
+        const b2 = data2[i + 2];
+        
+        // Calculate color difference using Euclidean distance
+        const rDiff = Math.abs(r1 - r2);
+        const gDiff = Math.abs(g1 - g2);
+        const bDiff = Math.abs(b1 - b2);
+        const colorDiff = Math.sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
+        
+        totalDiff += colorDiff;
+        pixelCount++;
+        
+        // Count significant changes (pixels that changed by more than 30 in any channel - much higher threshold)
+        if (rDiff > 30 || gDiff > 30 || bDiff > 30) {
+            significantChanges++;
+        }
+    }
+    
+    const avgDiff = totalDiff / pixelCount;
+    const changeRatio = significantChanges / pixelCount;
+    
+    // Check if enough of the frame changed (minimum motion area requirement)
+    if (changeRatio < MIN_MOTION_AREA) {
+        // Not enough of the frame changed - likely noise, return low score
+        return avgDiff * 0.1; // Heavily penalize small changes
+    }
+    
+    // Return a weighted score that emphasizes both average change and percentage of changed pixels
+    // Reduced multiplier for less sensitivity
+    const motionScore = avgDiff * (1 + changeRatio * 1.2);
+    
+    return motionScore;
+}
+
+// Trigger dashboard load on motion
+async function triggerDashboardLoad() {
+    if (isLoading) return;
+    isLoading = true;
+    
     const startTime = Date.now();
-    const minLoadingTime = 3000; // 2 seconds minimum
+    const minLoadingTime = 3000; // 3 seconds minimum
     
     showLoading();
     const data = await loadData();
@@ -271,12 +512,47 @@ async function init() {
         console.error('Failed to load data');
     }
     
-    // Ensure loading animation shows for at least 2 seconds
+    // Ensure loading animation shows for at least 3 seconds
     const elapsedTime = Date.now() - startTime;
     const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
     setTimeout(() => {
         hideLoading();
+        isLoading = false;
+        isDashboardVisible = true;
+        lastMotionTime = Date.now(); // Reset motion timer when dashboard appears
+        // Set initial timeout for 3 minutes of no motion
+        noMotionTimeout = setTimeout(() => {
+            fadeToBlack();
+            lastMotionTime = null;
+            noMotionTimeout = null;
+        }, NO_MOTION_TIMEOUT);
     }, remainingTime);
+}
+
+// Fade to black after no motion
+function fadeToBlack() {
+    if (!isDashboardVisible) return;
+    
+    // Clear any existing timeout
+    if (noMotionTimeout) {
+        clearTimeout(noMotionTimeout);
+        noMotionTimeout = null;
+    }
+    
+    // Hide dashboard with fade
+    document.body.classList.add('black-screen');
+    isDashboardVisible = false;
+    lastMotionTime = null;
+}
+
+// Main function to initialize the dashboard (now called on motion)
+async function init() {
+    // Start with black screen
+    document.body.classList.add('black-screen');
+    isDashboardVisible = false;
+    
+    // Request camera permission immediately
+    await initCamera();
 }
 
 // Loading animation functions
@@ -309,6 +585,7 @@ function hideLoading() {
     }
     // Show dashboard content after loading
     document.body.classList.remove('loading');
+    document.body.classList.remove('black-screen'); // Remove black screen
     // Animate cards one by one
     animateCards();
 }
